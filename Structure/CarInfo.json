@@ -1,0 +1,14 @@
+{
+    "mileage":100,
+    "color":"string",
+    "type":"string",
+    "manufacturingyear":21515,
+    "cleantitle":"bool",
+    "EngineType":"string",
+    "geartype":"string",
+    "Fuel":"string",
+    "Drive":"string",
+    "price":151,
+    "Notes":"string",
+    "location":"string"
+}

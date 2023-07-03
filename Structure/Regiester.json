@@ -1,0 +1,9 @@
+{
+    "FirstName":"string",
+    "LastName":"string",
+    "Email":"string",
+    "Phonenumber":1000,
+    "Address":"string",
+    "enteryourpassword":"string",
+    "confirmyourpassword":"string"
+}
