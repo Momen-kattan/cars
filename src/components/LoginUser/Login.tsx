@@ -8,9 +8,11 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 import setAuthToken, { TokenResponse } from "../../interceptor";
+import profile from "../../store";
+
 interface Props {
   setOpen: () => void;
 }
@@ -70,6 +72,12 @@ const SignUpLink = styled(Link)({
 });
 
 const Login = ({ setOpen }: Props): JSX.Element => {
+  const navigate = useNavigate();
+
+  if (localStorage.getItem("token")) {
+    setAuthToken(localStorage.getItem("token"));
+  }
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -80,8 +88,10 @@ const Login = ({ setOpen }: Props): JSX.Element => {
       })
       .then((res) => {
         const token = res.data.access;
-        setAuthToken(token); // Log the response data to the console
-        return token;
+        localStorage.setItem("token", token);
+        profile((s) => s.fetchProfile);
+        // Log the response data to the console
+        navigate("/");
       })
       .catch((error) => {
         console.error(error); // Log any errors to the console

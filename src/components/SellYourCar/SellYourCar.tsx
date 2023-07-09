@@ -1,4 +1,4 @@
-import React, { EventHandler, useState } from "react";
+import React, { ChangeEvent, EventHandler, useEffect, useState } from "react";
 import {
   Avatar,
   Box,
@@ -26,12 +26,14 @@ import { TextField } from "./components";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import useCountry from "../../hooks/useCountry";
-
+import setAuthToken from "../../interceptor";
+import useBrands from "../../hooks/useBrands";
+import useCar from "../../hooks/useCar";
 const initialValues = {
   mileage: "",
   color: "",
   type: "",
-  manufacturing_year_: "",
+  manufacturing_year: "",
   clean_title: "",
   engine_type: "",
   gear_type: "",
@@ -39,57 +41,101 @@ const initialValues = {
   notes: "",
   price: "",
   location: "",
+  brand: "",
+  car_models: "",
   file: "",
 };
-
+interface FileListItem {
+  file: File;
+  url: string;
+}
 const years = Array.from(
   { length: 100 },
   (_, i) => new Date().getFullYear() - i
 );
 const SellYourCar = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [imageUrl, setImageUrl] = useState<string[] | null>([]);
+  const [fileList, setFileList] = useState<FileListItem[]>([]);
   const [handle, setHandle] = useState<any>([]);
-  const { data, error, isLoading } = useCountry();
-  if (error) throw error;
-  console.log(data);
+  const [provineceData, setProvineceData] = useState<any>([]);
+  const [carModelData, setCarModelData] = useState<any>([]);
+  const {
+    data: countrys,
+    error: errorCountry,
+    isLoading: loadCountry,
+  } = useCountry();
+  const {
+    data: brands,
+    error: errorBrands,
+    isLoading: loadBrands,
+  } = useBrands();
+  const { data: cars, error: errorCars, isLoading: LoadCars } = useCar();
   const onSubmit = async (values: any) => {
-    console.log("value", values);
-
-    return await axios.post(
-      "https://abdelwahapbak2.pythonanywhere.com/car/",
-      values
-    );
+    return await axios.post("http://192.168.43.198:8000/car/", values, {
+      headers: { "Content-type": "multipart/form-data" },
+    });
   };
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setAuthToken(token);
+  }, []);
   const handleSelect = async (event: any) => {
-    console.log(event.target.value);
     let provinece = await axios.get(
       `https://abdelwahapbak2.pythonanywhere.com/province/${event.target.value}`
     );
-    setHandle(provinece.data);
-    console.log("provinece", provinece);
+    setProvineceData(provinece.data);
   };
+
+  const handleChose = async (event: any) => {
+    let car_model = await axios.get(
+      `https://abdelwahapbak2.pythonanywhere.com/car_model/${event.target.value}`
+    );
+    setCarModelData(car_model.data);
+  };
+
   const { mutate } = useMutation(onSubmit);
+  // const handleFileChange = (
+  //   event: React.ChangeEvent<HTMLInputElement>,
+  //   setter?: Function
+  // ) => {
+  //   const selectedFile = event.target.files?.[0];
+  //   if (selectedFile) {
+  //     const fileReader = new FileReader();
+  //     fileReader.readAsDataURL(selectedFile);
+  //     fileReader.onload = () => {
+  //       const dataUrl = fileReader.result as string;
+  //       setImageUrl([...(imageUrl as string[]), dataUrl]);
+  //       setter?.((values: { file: [] }) => ({
+  //         ...values,
+  //         file: [...values.file, selectedFile],
+  //       }));
+  //     };
+  //   }
+  // };
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     setter?: Function
   ) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(selectedFile);
-      fileReader.onload = () => {
-        const dataUrl = fileReader.result as string;
-        setImageUrl([...(imageUrl as string[]), dataUrl]);
-        setter?.((values: { file: [] }) => ({
-          ...values,
-          file: [...values.file, selectedFile],
-        }));
-      };
+    const selectedFiles = event.target.files;
+    if (selectedFiles) {
+      for (let i = 0; i < selectedFiles?.length; i++) {
+        const selectedFile = selectedFiles[i];
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(selectedFile);
+        fileReader.onload = () => {
+          const dataUrl = fileReader.result as string;
+          setFileList((prevFileList) => [
+            ...prevFileList,
+            { file: selectedFile, url: dataUrl },
+          ]);
+          setter?.((values: { file: [] }) => ({
+            ...values,
+            file: [...values.file, selectedFile],
+          }));
+        };
+      }
     }
   };
-
-  console.log("imageurl", imageUrl);
   return (
     <Box m="20px ">
       <Formik
@@ -106,9 +152,12 @@ const SellYourCar = () => {
           handleSubmit,
           setValues,
         }) => {
-          console.log("val", values);
           return (
-            <form onSubmit={handleSubmit}>
+            <form
+              onSubmit={handleSubmit}
+              method="Post"
+              encType="multipart/form-data"
+            >
               <Box
                 display="grid"
                 gap="30px"
@@ -118,7 +167,7 @@ const SellYourCar = () => {
                 }}
               >
                 <TextField
-                  label="mileage"
+                  label="Mileage (km)"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.mileage}
@@ -190,14 +239,13 @@ const SellYourCar = () => {
                   </InputLabel>
                   <Select
                     labelId="manufacturing_year_label"
-                    id="manufacturing_year_"
-                    value={values.manufacturing_year_}
+                    id="manufacturing_year"
+                    value={values.manufacturing_year}
                     onChange={handleChange}
-                    name="manufacturing_year_"
-                    label="Manufacturing Year_"
+                    name="manufacturing_year"
+                    label="Manufacturing Year"
                     error={
-                      touched.manufacturing_year_ &&
-                      !!errors.manufacturing_year_
+                      touched.manufacturing_year && !!errors.manufacturing_year
                     }
                     renderValue={(selected) => selected || "Select Year"}
                   >
@@ -208,7 +256,6 @@ const SellYourCar = () => {
                     ))}
                   </Select>
                 </FormControl>
-
                 <FormControl variant="outlined">
                   <InputLabel sx={{ fontSize: 20 }}>
                     Select your engine_type
@@ -293,7 +340,7 @@ const SellYourCar = () => {
                     label="Select your location"
                     autoComplete="location"
                   >
-                    {data?.map((country) => (
+                    {countrys?.map((country) => (
                       <MenuItem key={country.country_name} value={country.id}>
                         {country.country_name}
                       </MenuItem>
@@ -314,7 +361,7 @@ const SellYourCar = () => {
                     label="Select your location"
                     autoComplete="location"
                   >
-                    {handle?.map((province: any) => (
+                    {provineceData?.map((province: any) => (
                       <MenuItem
                         key={province.province_name}
                         value={province.id}
@@ -353,9 +400,52 @@ const SellYourCar = () => {
                   )}
                 </FormControl>
 
+                <FormControl>
+                  <InputLabel id="brand-label" sx={{ fontSize: 20 }}>
+                    Select your car brand
+                  </InputLabel>
+                  <Select
+                    labelId="brand-label"
+                    id="brand"
+                    name="brand"
+                    onChange={handleChose}
+                    error={!!touched.brand && !!errors.brand}
+                    required
+                    label="Select your car brand"
+                    autoComplete="brand"
+                  >
+                    {brands?.map((brand: any) => (
+                      <MenuItem key={brand.name} value={brand.id}>
+                        {brand.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl>
+                  <InputLabel id="Model-label" sx={{ fontSize: 20 }}>
+                    Select your car Model
+                  </InputLabel>
+                  <Select
+                    labelId="car_model-label"
+                    id="car_models"
+                    name="car_models"
+                    onChange={handleChange}
+                    error={!!touched.car_models && !!errors.car_models}
+                    required
+                    label="Select your car Model"
+                    autoComplete="Model"
+                  >
+                    {carModelData?.map((car_models: any) => (
+                      <MenuItem key={car_models.name} value={car_models.id}>
+                        {car_models.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
                 <FormControl variant="outlined">
                   <h2>Add your car images:</h2>
-                  {(imageUrl as [])?.length > 0 && (
+                  {(fileList as [])?.length > 0 && (
                     <Paper
                       sx={{
                         width: "30vw",
@@ -366,12 +456,12 @@ const SellYourCar = () => {
                         justifyContent: "space-around",
                       }}
                     >
-                      {imageUrl?.map((img) => (
+                      {fileList?.map((img) => (
                         <Avatar
-                          src={img}
+                          src={img.url}
                           alt="uploaded car"
                           variant="square"
-                          sx={{ height: "15vh", width: "10vw" }}
+                          sx={{ height: "15vh", width: "12vw" }}
                         />
                       ))}
                     </Paper>
@@ -380,12 +470,12 @@ const SellYourCar = () => {
                   <input
                     type="file"
                     accept="image/*"
+                    multiple
                     onChange={(e) => handleFileChange(e, setValues)}
                     name="file"
                   />
                 </FormControl>
               </Box>
-
               <Box display="flex" justifyContent="end" mt="20px">
                 <Button type="submit" color="secondary" variant="contained">
                   submit your car information

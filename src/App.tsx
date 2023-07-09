@@ -13,12 +13,30 @@ import NewLogin from "./pages/Login";
 import Regist from "./pages/Regist";
 import { Home } from "./pages/Home";
 import SideBar from "./components/SideBar/SideBar";
+import Profile from "./components/Profile/Profile";
+import useProfile, { UserProfile } from "./hooks/useAuth";
+import { useState } from "react";
+import MyCars from "./components/MyCars/MyCars";
+import InformationMyCar from "./components/InformationMyCar/InformationMyCar";
 const ErrorPage = () => "page not found ";
 function App() {
+  // const { data, error, isLoading } = useProfile();
+  const [Auth, setAuth] = useState<boolean>(true);
+  // if (typeof data === undefined) {
+  //   setAuth(false);
+  // }
   return (
     <Routes>
-      <Route path="/" element={<SideBar />}>
+      <Route
+        path="/"
+        element={
+          <SideBar />
+          // Auth === false ? <SideBar /> : <SideBar myInformmation={data} />
+        }
+      >
         <Route path="" element={<Home />} />
+        <Route path="/MyCars" element={<MyCars />} />
+        <Route path="/informationMyCar/:id" element={<InformationMyCar />} />
         {/* <Route path="/login" element={<NewLogin />} /> */}
         <Route path="/regist" element={<Regist />} />
         {/* <Route path="/home" element={<SliderBar />} /> */}
@@ -27,7 +45,7 @@ function App() {
         <Route path="/LoginPOP" element={<PopUpLogin />} />
         <Route path="/SellYourCar" element={<SellYourCar />} />
       </Route>
-
+      {/* <Route path="/Profile" element={<Profile />} /> */}
       <Route path="*" element={<ErrorPage />} />
     </Routes>
   );

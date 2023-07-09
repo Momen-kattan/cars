@@ -18,12 +18,16 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
+import DriveEtaIcon from "@mui/icons-material/DriveEta";
 import NavBar from "../NavBar";
 import { DrawerHeader, closedMixin } from "./utils";
 import { Home } from "../../pages/Home";
 import { Outlet } from "react-router";
 import { Link } from "react-router-dom";
-
+import { UserProfile } from "../../hooks/useAuth";
+export interface profile {
+  myInformmation?: UserProfile;
+}
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -104,7 +108,6 @@ export default function MiniDrawer() {
             >
               <MenuIcon />
             </IconButton>
-
             <NavBar />
           </Toolbar>
         </AppBar>
@@ -120,33 +123,75 @@ export default function MiniDrawer() {
           </DrawerHeader>
           <Divider />
           <List>
-            {[
-              "live auction",
-              "later auction",
-              "auction calender",
-              "join auction",
-            ].map((text, index) => (
-              <ListItem key={text} disablePadding sx={{ display: "block" }}>
-                <ListItemButton
+            <ListItem disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
                   sx={{
-                    minHeight: 48,
-                    justifyContent: open ? "initial" : "center",
-                    px: 2.5,
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
                   }}
                 >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : "auto",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                </ListItemButton>
-              </ListItem>
-            ))}
+                  <MailIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="live auction"
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <MailIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="later auction"
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <MailIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="calender auction"
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
+              </ListItemButton>
+            </ListItem>
           </List>
           <Divider />
           <List>
@@ -173,6 +218,34 @@ export default function MiniDrawer() {
                   </ListItemIcon>
                   <ListItemText
                     primary="Sell your car"
+                    sx={{ opacity: open ? 1 : 0 }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Link
+              to="/MyCars"
+              style={{ textDecoration: "none", color: "black" }}
+            >
+              <ListItem disablePadding sx={{ display: "block" }}>
+                <ListItemButton
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <DriveEtaIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="My cars"
                     sx={{ opacity: open ? 1 : 0 }}
                   />
                 </ListItemButton>

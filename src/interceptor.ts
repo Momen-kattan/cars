@@ -7,7 +7,7 @@ export  interface TokenResponse {
   const setAuthToken = (token: string | null) => {
     if (token) {
       // Apply the token to every request header
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axios.defaults.headers.common["Authorization"] = `motors&more ${token}`;
     } else {
       // Remove the token from the headers
       delete axios.defaults.headers.common["Authorization"];

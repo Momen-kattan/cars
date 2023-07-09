@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import useCountry from "../../hooks/useCountry";
 import { useState } from "react";
+import addUser from "../../hooks/addUser";
 
 export default function Regist() {
   const [handle, setHandle] = useState<any>([]);
@@ -32,30 +33,40 @@ export default function Regist() {
     console.log("provinece", provinece);
   };
   const { data, error, isLoading } = useCountry();
+
   if (error) throw error;
   console.log(data);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log(data.get("email"));
+    const dataForm = new FormData(event.currentTarget);
+    const values = {
+      first_name: dataForm.get("first_name"),
+      last_name: dataForm.get("last_name"),
+      email: dataForm.get("email"),
+      password: dataForm.get("password"),
+      gender: dataForm.get("gender"),
+      location: dataForm.get("location"),
+      phone: dataForm.get("phone"),
+    };
     try {
       const response = await axios.post(
         "https://abdelwahapbak2.pythonanywhere.com/create_client",
         {
-          first_name: data.get("first_name"),
-          last_name: data.get("last_name"),
-          email: data.get("email"),
-          password: data.get("password"),
-          gender: data.get("gender"),
-          location: data.get("location"),
-          phone: data.get("phone"),
+          first_name: dataForm.get("first_name"),
+          last_name: dataForm.get("last_name"),
+          email: dataForm.get("email"),
+          password: dataForm.get("password"),
+          gender: dataForm.get("gender"),
+          location: dataForm.get("location"),
+          phone: dataForm.get("phone"),
         }
       );
       console.log(response.data);
     } catch (error) {
-      console.log(data.get("email"));
+      console.log(dataForm.get("email"));
       console.error(error);
     }
+    console.log(data);
   };
   if (isLoading)
     return (
@@ -154,7 +165,7 @@ export default function Regist() {
                 labelId="gender-label"
                 id="gender"
                 name="gender"
-                defaultValue="male"
+                defaultValue="Male"
                 required
                 label="Select your gender"
               >

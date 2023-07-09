@@ -8,8 +8,12 @@ import { Link, useNavigate } from "react-router-dom";
 import PopUpLogin from "../LoginUser/PopUpLogin";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import { useStore } from "zustand";
+import { useEffect } from "react";
+import profile from "../../store";
 
 const ListItem = () => {
+  const store = profile((s) => s.email);
   const navigate = useNavigate();
   return (
     <Box sx={{ display: { xs: "none", md: "flex" } }}>
