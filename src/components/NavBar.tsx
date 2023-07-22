@@ -16,15 +16,19 @@ import image from "./../images/car-logo-png-2320.png";
 // import { profile } from "../components/SideBar/SideBar";
 import InformationUser from "./NavBar/InformationUser";
 import profile from "../store";
+import useProfile from "../hooks/useAuth";
 
 export default function NavBar() {
   const mobileMenuId = "primary-search-account-menu-mobile";
-  const email = profile((s) => s.email);
+  const { data } = useProfile();
+  const setProfile = profile((state) => state.logOut);
+
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
   const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
+  console.log("data", data);
   return (
     <Box
       sx={{
@@ -51,8 +55,7 @@ export default function NavBar() {
         Motors and more
         <SearchPart />
         <Box sx={{ flexGrow: 1 }} />
-        {/* <ListItem /> */}
-        {email.length != 0 ? <InformationUser /> : <ListItem />}
+        {data ? <InformationUser /> : <ListItem />}
         <Box sx={{ display: { xs: "raw", md: "none" } }}>
           <IconButton
             size="large"

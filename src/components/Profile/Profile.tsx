@@ -29,13 +29,7 @@ interface ProfileProps {
   address: string;
 }
 
-const Profile: React.FC<ProfileProps> = ({
-  name,
-  email,
-  age,
-  gender,
-  address,
-}) => {
+const Profile = () => {
   const [cars, setCars] = useState<Car[]>([]);
 
   useEffect(() => {
@@ -60,11 +54,11 @@ const Profile: React.FC<ProfileProps> = ({
           alt="Profile Avatar"
         />
         <div className="profile-details">
-          <p>Name: {name}</p>
-          <p>Email: {email}</p>
-          <p>Age: {age}</p>
-          <p>Gender: {gender}</p>
-          <p>Address: {address}</p>
+          <p>Name: momen</p>
+          <p>Email: admin</p>
+          <p>Age: 25</p>
+          <p>Gender: male</p>
+          <p>Address: AL shhbndar street</p>
         </div>
       </div>
 

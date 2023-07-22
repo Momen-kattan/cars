@@ -1,21 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
 import APIClient from '../services/APIClient';
 import axios from 'axios';
-type  car_model =  {
+type  main_section =  {
     id: number;
     name: string;
-    brand_id:number;
   }[] 
-const useCar= () =>{
+const useMainSection= () =>{
 const apiClient=async ()=> {
- const result= await axios.get<car_model> ( 
- "https://abdelwahapbak2.pythonanywhere.com/car_model/2"
+ const result= await axios.get<main_section> ( 
+     "https://abdelwahapbak2.pythonanywhere.com/main_section"
 )
 return result.data
 }
 return useQuery({
-    queryKey: [" car_model"],
+    queryKey: ["main_section"],
     queryFn:  apiClient
   });
 };
-export default useCar
+export default useMainSection

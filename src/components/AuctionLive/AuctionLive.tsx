@@ -7,13 +7,15 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { Slide } from "react-slideshow-image";
 import useSelectedCar from "../../hooks/useSelectedCar";
 import { useParams } from "react-router-dom";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-
+import CircularProgress, {
+  CircularProgressProps,
+} from "@mui/material/CircularProgress";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -58,11 +60,55 @@ const slideImages = [
   },
 ];
 
-const InformationMyCar = () => {
+function CircularProgressWithLabel(
+  props: CircularProgressProps & { value: number }
+) {
+  return (
+    <Box
+      sx={{
+        position: "relative",
+        display: "inline-flex",
+      }}
+    >
+      <CircularProgress size={200} variant="determinate" {...props} />
+      <Button
+        sx={{
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          position: "absolute",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box>
+          <Typography
+            variant="caption"
+            component="div"
+            color="text.secondary"
+          >{`${Math.round(props.value)}%`}</Typography>
+        </Box>
+      </Button>
+    </Box>
+  );
+}
+
+const AuctionLive = () => {
   const { id } = useParams();
   const { data } = useSelectedCar(id!);
-  const damage = "Front-end damage,nd damage,Front-end damage";
-  const damageList = damage.split(",");
+  const [progress, setProgress] = React.useState(1);
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prevProgress) =>
+        prevProgress >= 100 ? 0 : prevProgress + 1
+      );
+    }, 1200);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
   return (
     <>
       <Grid container spacing={5}>
@@ -179,6 +225,7 @@ const InformationMyCar = () => {
             </TableContainer>
           </Grid>
           <Grid item xs={12} lg={6}>
+            <CircularProgressWithLabel value={progress} />
             <TableContainer component={Paper}>
               <Table sx={{ minWidth: 90 }} aria-label="customized table">
                 <TableHead>
@@ -209,25 +256,6 @@ const InformationMyCar = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <TableContainer style={{ marginTop: "10px" }} component={Paper}>
-              <Table sx={{ minWidth: 90 }} aria-label="customized table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell align="right">damage</StyledTableCell>
-                    <StyledTableCell></StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {damageList.map((damage) => (
-                    <StyledTableRow>
-                      <StyledTableCell align="center" scope="row">
-                        {damage}
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
           </Grid>
         </Grid>
       </Grid>
@@ -235,4 +263,4 @@ const InformationMyCar = () => {
   );
 };
 
-export default InformationMyCar;
+export default AuctionLive;

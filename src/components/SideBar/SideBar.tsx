@@ -123,29 +123,34 @@ export default function MiniDrawer() {
           </DrawerHeader>
           <Divider />
           <List>
-            <ListItem disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
+            <Link
+              to="/AuctionLive"
+              style={{ textDecoration: "none", color: "black" }}
+            >
+              <ListItem disablePadding sx={{ display: "block" }}>
+                <ListItemButton
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
                   }}
                 >
-                  <MailIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary="live auction"
-                  sx={{ opacity: open ? 1 : 0 }}
-                />
-              </ListItemButton>
-            </ListItem>
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <MailIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="live auction"
+                    sx={{ opacity: open ? 1 : 0 }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{

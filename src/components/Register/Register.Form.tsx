@@ -1,26 +1,19 @@
-import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import { Link } from "react-router-dom";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { CircularProgress, InputLabel, MenuItem, Select } from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
-import {
-  FormControl,
-  InputLabel,
-  List,
-  MenuItem,
-  Select,
-  CircularProgress,
-} from "@mui/material";
-import useCountry from "../../hooks/useCountry";
+import * as React from "react";
 import { useState } from "react";
-import addUser from "../../hooks/addUser";
+import { Link } from "react-router-dom";
+import useCountry from "../../hooks/useCountry";
+import HeaderFormRegister from "./HeaderFormRegister";
 
 export default function Regist() {
   const [handle, setHandle] = useState<any>([]);
@@ -89,12 +82,7 @@ export default function Regist() {
         alignItems: "center",
       }}
     >
-      <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-        <LockOutlinedIcon />
-      </Avatar>
-      <Typography component="h1" variant="h5">
-        Sign up
-      </Typography>
+      <HeaderFormRegister />
       <Box
         component="form"
         noValidate

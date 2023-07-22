@@ -1,7 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import APIClient from '../services/APIClient';
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { number, string } from 'yup';
 export interface User{
   first_name: string,
   last_name:string,

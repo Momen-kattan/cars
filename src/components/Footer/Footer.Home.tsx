@@ -102,7 +102,7 @@ export default function Footer(): JSX.Element {
                   "&:hover": { textDecoration: "underline" },
                 }}
               >
-                +1 234 567 8901
+                +963 234 567 8901
               </Link>
             </Typography>
           </Grid>
