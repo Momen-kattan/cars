@@ -2,7 +2,6 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import profile from "../../store";
 import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -14,19 +13,24 @@ import profile from "../../store";
 import { useQueryClient } from "@tanstack/react-query";
 import Badge from "@mui/material/Badge";
 import axios from "axios";
-import { Button } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-// import { profile } from "../SideBar/SideBar";
+
 const InformationUser = () => {
   const setProfile = profile((s) => s.fetchProfile);
-  // const dataProfile = profile((s) => s.profile);
+
   const navigate = useNavigate();
   const client = useQueryClient();
-
   const settings = ["Profile", "Account", "Logout"];
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [anchorElNote, setAnchorElNote] = useState<null | HTMLElement>(null);
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
+  };
+  const handleOpenNoteMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElNote(event.currentTarget);
+  };
+  const handleCloseNoteMenu = () => {
+    setAnchorElNote(null);
   };
   const { data } = useProfile();
   const handleCloseUserMenu = () => {
@@ -39,16 +43,51 @@ const InformationUser = () => {
 
   return (
     <Box sx={{ display: { xs: "none", md: "flex" } }}>
-      <IconButton
-        size="large"
-        aria-label="show 17 new notifications"
-        color="inherit"
-        style={{ marginRight: 25 }}
-      >
-        <Badge badgeContent={17} color="error">
-          <NotificationsIcon />
-        </Badge>
-      </IconButton>
+      <Box sx={{ flexGrow: 0 }}>
+        <IconButton
+          size="large"
+          aria-label="show 17 new notifications"
+          color="inherit"
+          style={{ marginRight: 25 }}
+          onClick={handleOpenNoteMenu}
+        >
+          <Badge badgeContent={10} color="error">
+            <NotificationsIcon />
+          </Badge>
+          <Menu
+            sx={{ mt: "45px" }}
+            id="menu-appbar"
+            anchorEl={anchorElNote}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            open={Boolean(anchorElNote)}
+            onClose={() => setAnchorElNote(null)}
+            // PaperProps={{
+            //   sx: {
+            //     width: 200, // Set the desired width for the menu
+            //   },
+            // }}
+          >
+            <MenuItem
+              onClick={() => {
+                navigate("/profile");
+              }}
+            >
+              <Typography textAlign="center">my koko</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleCloseNoteMenu}>
+              <Typography textAlign="center">logOut</Typography>
+            </MenuItem>
+          </Menu>
+        </IconButton>
+      </Box>
       <Box sx={{ flexGrow: 0 }}>
         <Tooltip title="Open settings">
           <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

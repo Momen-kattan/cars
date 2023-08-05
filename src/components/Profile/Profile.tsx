@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Profile.css"; // Import the CSS file
 import NavBar from "../NavBar";
+import axiosInstance from "../../services/APIClient";
 
 interface Car {
   id: number;
@@ -34,8 +35,8 @@ const Profile = () => {
 
   useEffect(() => {
     // Fetch the user's cars from the backend using Axios
-    axios
-      .get("https://abdelwahapbak2.pythonanywhere.com/car/")
+    axiosInstance
+      .get("/car/")
       .then((response) => {
         setCars(response.data);
       })

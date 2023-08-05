@@ -1,21 +1,44 @@
-import * as React from "react";
-import { styled } from "@mui/material/styles";
+import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { Box, Button, Grid, Typography } from "@mui/material";
-import { Slide } from "react-slideshow-image";
-import useSelectedCar from "../../hooks/useSelectedCar";
-import { useParams } from "react-router-dom";
+import { styled } from "@mui/material/styles";
+import * as React from "react";
+import { Image } from "@mui/icons-material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import {
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  FormControl,
+  Grid,
+  ImageListItem,
+  ImageListItemBar,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import CircularProgress, {
   CircularProgressProps,
 } from "@mui/material/CircularProgress";
+import { useEffect, useRef, useState } from "react";
+import ImageGallery from "react-image-gallery";
+import { useParams } from "react-router-dom";
+import useCarAuction, { car_in_auction } from "../../hooks/useCarAuction";
+import { Car } from "../../hooks/useMyCar";
+import { socket } from "./../../socket";
+import { number } from "yup";
+import { useAudio } from "react-use";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -38,30 +61,57 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+interface Image {
+  original: string;
+  thumbnail: string;
+  originalHeight: number;
+}
 const slideImages = [
   {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg/400px-2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg",
+    original:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg/400px-2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg",
+    thumbnail:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg/400px-2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg",
+    originalHeight: 400,
   },
   {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/AudiS_five.jpg/400px-AudiS_five.jpg",
+    original:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/AudiS_five.jpg/400px-AudiS_five.jpg",
+    thumbnail:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/AudiS_five.jpg/400px-AudiS_five.jpg",
+    originalHeight: 400,
   },
   {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/2013_Mercedes-Benz_SL_550_vf.jpg/400px-2013_Mercedes-Benz_SL_550_vf.jpg",
+    original:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/2013_Mercedes-Benz_SL_550_vf.jpg/400px-2013_Mercedes-Benz_SL_550_vf.jpg",
+    thumbnail:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/2013_Mercedes-Benz_SL_550_vf.jpg/400px-2013_Mercedes-Benz_SL_550_vf.jpg",
+    originalHeight: 400,
   },
   {
-    url: "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
+    original:
+      "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
+    thumbnail:
+      "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
+    originalHeight: 400,
   },
   {
-    url: "https://images.unsplash.com/photo-1547038577-da80abbc4f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=755&q=80",
+    original:
+      "https://images.unsplash.com/photo-1547038577-da80abbc4f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=755&q=80",
+    thumbnail:
+      "https://images.unsplash.com/photo-1547038577-da80abbc4f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=755&q=80",
+    originalHeight: 400,
   },
-
   {
-    url: "https://images.unsplash.com/photo-1542228262-3d663b306a53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80",
+    original:
+      "https://images.unsplash.com/photo-1542228262-3d663b306a53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80",
+    thumbnail:
+      "https://images.unsplash.com/photo-1542228262-3d663b306a53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80",
+    originalHeight: 400,
   },
 ];
-
 function CircularProgressWithLabel(
-  props: CircularProgressProps & { value: number }
+  props: CircularProgressProps & { value: number; currentPrice: string }
 ) {
   return (
     <Box
@@ -70,7 +120,12 @@ function CircularProgressWithLabel(
         display: "inline-flex",
       }}
     >
-      <CircularProgress size={200} variant="determinate" {...props} />
+      <CircularProgress
+        size={120}
+        variant="determinate"
+        {...props}
+        value={Math.round((props.value * 100) / 30)}
+      />
       <Button
         sx={{
           top: 0,
@@ -81,184 +136,301 @@ function CircularProgressWithLabel(
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          margin: 0,
         }}
       >
         <Box>
-          <Typography
-            variant="caption"
-            component="div"
-            color="text.secondary"
-          >{`${Math.round(props.value)}%`}</Typography>
+          <Typography variant="caption" component="div" color="text.secondary">
+            {props.currentPrice} M
+            <br />
+            {`${Math.round(props.value)}`}
+          </Typography>
         </Box>
       </Button>
     </Box>
   );
 }
 
+// function hii() {
+//   socket.emit("hello", { abbode: 1 });
+//   console.log("h000000000000000000000000000000000000");
+// }
+interface ListItem {
+  id: number;
+  name: string;
+  age: number;
+}
 const AuctionLive = () => {
+  const [selectedValue, setSelectedValue] = useState("");
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [IsStartAuction, setIsStartAuction] = useState(false);
   const { id } = useParams();
-  const { data } = useSelectedCar(id!);
+  const { data: cars } = useCarAuction(id!);
+  const [mainCar, setMainCar] = useState<Car>();
+  const [listNextCar, setListNextCar] = useState<car_in_auction[]>([]);
+  const [owner, setOwner] = useState(0);
+  const [auctionId, setAuctionId] = useState(0);
+  const [currentPrice, setCurrentPrice] = useState("");
   const [progress, setProgress] = React.useState(1);
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) =>
-        prevProgress >= 100 ? 0 : prevProgress + 1
-      );
-    }, 1200);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+  const prices = ["0.5", "1", "2", "5", "7", "10"];
+  const [images, setImages] = useState<Image[]>([]);
+  const [audio, state, controls] = useAudio({
+    src: "/cars/src/sound/clickbidding.m4a",
+    autoPlay: false,
+  });
+  const handleSelectChange = (event: any) => {
+    setSelectedValue(event.target.value as string);
+  };
+  const handleBidding = () => {
+    controls.play();
+    if (selectedValue === "") {
+    } else {
+      socket.emit("outbid", {
+        auction_id: auctionId,
+        car_bids_on_it: mainCar?.id,
+        owner_car_id: owner,
+        amount: selectedValue,
+      });
+    }
+  };
+  const processAuction = (data: any) => {
+    setIsStartAuction(data.watcher);
+    setProgress(data.counter);
+    setOwner(data.owner_car_id);
+    setAuctionId(data.auction_id);
+    setCurrentPrice(data.price);
+    cars?.map((car) => {
+      if (car.car_info.id < data.car_bids_on_it) {
+      } else if (car.car_info.id === data.car_bids_on_it) {
+        setMainCar(car.car_info);
+        const updatedImages = car.car_info.images.map((image: string) => {
+          return { original: image, thumbnail: image, originalHeight: 400 };
+        });
+        setImages(updatedImages);
+        if (data.car_bids_on_it === cars[cars.length - 1].car_id) {
+          setListNextCar([]);
+        }
+      } else {
+        const listCar = cars.filter((c) => c.car_info.id > data.car_bids_on_it);
+        console.log(listCar);
+        setListNextCar(listCar);
+      }
+    });
+  };
+  useEffect(() => {
+    socket.on("start_auction", (data) => {
+      data["watcher"] = true;
+      processAuction(data);
+    });
+    socket.on("watcher", (data) => {
+      data["watcher"] = false;
+      processAuction(data);
+    });
+    socket.on("bidding", (data) => {
+      controls.play();
+      console.log(data);
+    });
+    return () => {};
+  }, [cars, listNextCar]);
   return (
     <>
-      <Grid container spacing={5}>
-        <Grid item xs={12} lg={6}>
-          <Slide>
-            {slideImages.map((slideImage, index) => (
-              <div key={index}>
-                <Box
-                  style={{
-                    backgroundSize: "cover",
-                    height: "400px",
-                    backgroundImage: `url(${slideImage.url})`,
-                  }}
-                ></Box>
-              </div>
-            ))}
-          </Slide>
-        </Grid>
-        <Grid container item xs={12} lg={6} spacing={1}>
-          <Grid item xs={12} lg={6}>
+      <form>
+        <Grid container spacing={5}>
+          <Grid item xs={12} lg={4}>
+            <ImageGallery
+              items={images}
+              slideInterval={3000}
+              showIndex={true}
+            />
+          </Grid>
+          <Grid container item xs={12} lg={4}>
             <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 90 }} aria-label="customized table">
+              <Table
+                sx={{ minWidth: 80 }}
+                size="small"
+                aria-label="customized table"
+              >
                 <TableHead>
                   <TableRow>
-                    <StyledTableCell align="right">
+                    <StyledTableCell align="center"></StyledTableCell>
+                    <StyledTableCell align="center">
                       Vehicle Details
                     </StyledTableCell>
-                    <StyledTableCell></StyledTableCell>
+                    <StyledTableCell align="center"></StyledTableCell>
+                    <StyledTableCell align="center"></StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   <StyledTableRow>
                     <StyledTableCell scope="row">mileage</StyledTableCell>
                     <StyledTableCell align="right">
-                      {data?.mileage}
+                      {mainCar?.mileage}
                     </StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
                     <StyledTableCell scope="row">color</StyledTableCell>
-                    <StyledTableCell align="right">
-                      {data?.color}
+                    <StyledTableCell align="left">
+                      {mainCar?.color}
                     </StyledTableCell>
                   </StyledTableRow>
                   <StyledTableRow>
                     <StyledTableCell scope="row">
-                      manufacturing_year
+                      manufacturing year
                     </StyledTableCell>
                     <StyledTableCell align="right">
-                      {data?.manufacturing_year}
+                      {mainCar?.manufacturing_year}
                     </StyledTableCell>
-                  </StyledTableRow>
-
-                  <StyledTableRow>
-                    <StyledTableCell scope="row">clean_title</StyledTableCell>
-                    <StyledTableCell align="right">
-                      {data?.clean_title ? (
+                    <StyledTableCell scope="row">clean title</StyledTableCell>
+                    <StyledTableCell align="left">
+                      {mainCar?.clean_title ? (
                         <CheckIcon color="success" />
                       ) : (
                         <CloseIcon color="error" />
                       )}
                     </StyledTableCell>
                   </StyledTableRow>
-
                   <StyledTableRow>
-                    <StyledTableCell scope="row">engine_type</StyledTableCell>
+                    <StyledTableCell scope="row">engine type</StyledTableCell>
                     <StyledTableCell align="right">
-                      {data?.engine_type}
+                      {mainCar?.engine_type}
+                    </StyledTableCell>
+                    <StyledTableCell scope="row">gear type</StyledTableCell>
+                    <StyledTableCell align="left">
+                      {mainCar?.engine_type}
                     </StyledTableCell>
                   </StyledTableRow>
-
-                  <StyledTableRow>
-                    <StyledTableCell scope="row">gear_type</StyledTableCell>
-                    <StyledTableCell align="right">
-                      {data?.gear_type}
-                    </StyledTableCell>
-                  </StyledTableRow>
-
                   <StyledTableRow>
                     <StyledTableCell scope="row">cylinders</StyledTableCell>
                     <StyledTableCell align="right">
-                      {data?.cylinders}
+                      {mainCar?.cylinders}
+                    </StyledTableCell>
+                    <StyledTableCell scope="row">car models</StyledTableCell>
+                    <StyledTableCell align="left">
+                      {mainCar?.car_model}
                     </StyledTableCell>
                   </StyledTableRow>
-
-                  <StyledTableRow>
-                    <StyledTableCell scope="row">notes</StyledTableCell>
-                    <StyledTableCell align="right">
-                      {data?.notes}
-                    </StyledTableCell>
-                  </StyledTableRow>
-
                   <StyledTableRow>
                     <StyledTableCell scope="row">price</StyledTableCell>
                     <StyledTableCell align="right">
-                      {data?.price}
+                      {mainCar?.price}
                     </StyledTableCell>
-                  </StyledTableRow>
-
-                  <StyledTableRow>
                     <StyledTableCell scope="row">location</StyledTableCell>
-                    <StyledTableCell align="right">
-                      {data?.location}
+                    <StyledTableCell align="left">
+                      {mainCar?.location}
                     </StyledTableCell>
                   </StyledTableRow>
-
                   <StyledTableRow>
-                    <StyledTableCell scope="row">car_models</StyledTableCell>
-                    <StyledTableCell align="right">
-                      {data?.car_model}
+                    <StyledTableCell scope="row">notes</StyledTableCell>
+                    <StyledTableCell align="center">
+                      {mainCar?.notes}
                     </StyledTableCell>
                   </StyledTableRow>
                 </TableBody>
               </Table>
             </TableContainer>
           </Grid>
-          <Grid item xs={12} lg={6}>
-            <CircularProgressWithLabel value={progress} />
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 90 }} aria-label="customized table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell align="right">
-                      Bid Information
-                    </StyledTableCell>
-                    <StyledTableCell></StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <StyledTableRow>
-                    <StyledTableCell scope="row">model</StyledTableCell>
-                    <StyledTableCell align="right">535</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell scope="row">model</StyledTableCell>
-                    <StyledTableCell align="right">535</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell scope="row">model</StyledTableCell>
-                    <StyledTableCell align="right">535</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell scope="row">model</StyledTableCell>
-                    <StyledTableCell align="right">535</StyledTableCell>
-                  </StyledTableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
+          <Grid container item xs={12} lg={4}>
+            <Grid item xs={12} lg={4}>
+              <CircularProgressWithLabel
+                value={progress}
+                currentPrice={currentPrice}
+              />
+              <Button
+                className="bidding"
+                variant="contained"
+                color="secondary"
+                fullWidth
+                sx={{ mt: 5, mb: 2, mr: 2, height: "50px" }}
+                disabled={!IsStartAuction}
+                onClick={handleBidding}
+              >
+                bidding
+              </Button>
+              <Box component="form" sx={{ mt: 5 }}>
+                <FormControl variant="outlined" sx={{ width: "100%" }}>
+                  <InputLabel id="current_price_label" sx={{ fontSize: 12 }}>
+                    price bidding car
+                  </InputLabel>
+                  <Select
+                    labelId="current_price"
+                    id="current_price"
+                    name="current_price"
+                    label="current_price"
+                    value={selectedValue}
+                    onChange={handleSelectChange}
+                    disabled={!IsStartAuction}
+                  >
+                    {prices.map((price) => (
+                      <MenuItem
+                        key={price}
+                        value={price}
+                        onClick={() => {
+                          const nameInput = document.querySelector(
+                            'input[name="bidding"]'
+                          ) as HTMLInputElement;
+                          if (nameInput) {
+                            nameInput.focus();
+                          }
+                        }}
+                      >
+                        {price} M SP
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+              {audio}
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <List
+                sx={{
+                  width: "100%",
+                  maxWidth: 360,
+                  bgcolor: "background.paper",
+                }}
+              >
+                {listNextCar.map((car) => (
+                  <>
+                    <ListItem alignItems="flex-start">
+                      <ListItemAvatar sx={{ mr: 2, width: 100, height: 80 }}>
+                        <ImageListItem>
+                          <img
+                            alt="Travis Howard"
+                            src={car.car_info.images[0]}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              borderRadius: 0,
+                            }}
+                          />
+                          <ImageListItemBar sx={{ height: 20 }} title="next" />
+                        </ImageListItem>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={car.car_info.car_model}
+                        secondary={
+                          <React.Fragment>
+                            <Typography
+                              sx={{ display: "inline" }}
+                              component="span"
+                              variant="body2"
+                              color="text.primary"
+                            >
+                              lot:{car.car_id}
+                            </Typography>
+                            <Typography>
+                              odoMeter: {car.car_info.mileage}
+                            </Typography>
+                          </React.Fragment>
+                        }
+                      />
+                    </ListItem>
+                    <Divider variant="inset" component="li" />
+                  </>
+                ))}
+              </List>
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      </form>
     </>
   );
 };

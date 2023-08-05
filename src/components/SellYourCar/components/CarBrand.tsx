@@ -2,6 +2,7 @@ import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import React from "react";
 import useBrands from "../../../hooks/useBrands";
 import axios from "axios";
+import axiosInstance from "../../../services/APIClient";
 interface Props {
   SetCarModel: (e: any) => void;
 }
@@ -14,9 +15,7 @@ const CarBrand = ({ SetCarModel }: Props) => {
   } = useBrands();
 
   const handleChose = async (event: any) => {
-    let car_model = await axios.get(
-      `https://abdelwahapbak2.pythonanywhere.com/car_model/${event.target.value}`
-    );
+    let car_model = await axiosInstance.get(`/car_model/${event.target.value}`);
     SetCarModel(car_model.data);
   };
   return (

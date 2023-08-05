@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { Outlet, Route, Routes, useNavigate } from "react-router-dom";
 import Login from "./components/LoginUser/Login";
 import Form from "./components/Register/Register.Form";
@@ -13,6 +13,9 @@ import AuctionLive from "./components/AuctionLive/AuctionLive";
 import { styled } from "@mui/material";
 import { keyframes } from "@emotion/react";
 import { ArrowBack } from "@mui/icons-material";
+import { Suspense } from "react";
+import CalenderAuction from "./components/CalenderAuction/CalenderAuction";
+import Auctions from "./components/Auctions/Auctions";
 
 const fadeIn = keyframes`
   from {
@@ -104,15 +107,24 @@ function App() {
       <Route path="/" element={<SideBar />}>
         <Route path="" element={<Home />} />
         <Route path="/MyCars" element={<MyCars />} />
-        <Route path="/AuctionLive" element={<AuctionLive />} />
+        <Route path="/AuctionLive/:id" element={<AuctionLive />} />
         <Route path="/informationMyCar/:id" element={<InformationMyCar />} />
-        {/* <Route path="/login" element={<NewLogin />} /> */}
-        {/* <Route path="/home" element={<SliderBar />} /> */}
+        <Route path="/Auctions/:id" element={<Auctions />} />
         <Route path="/Register" element={<Form />} />
-        {/* <Route path='/Sell_your_car' element={<Login/>}/> */}
+        <Route path="/Calendar" element={<CalenderAuction />} />
         <Route path="/LoginPOP" element={<PopUpLogin />} />
         <Route path="/SellYourCar" element={<SellYourCar />} />
         <Route path="/Profile" element={<Profile />} />
+        <Route
+          path="/Login"
+          element={
+            <Login
+              setOpen={function (): void {
+                throw new Error("Function not implemented.");
+              }}
+            />
+          }
+        />
       </Route>
       <Route path="*" element={<ErrorPage />} />
     </Routes>

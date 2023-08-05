@@ -13,7 +13,12 @@ import useSelectedCar from "../../hooks/useSelectedCar";
 import { useParams } from "react-router-dom";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-
+import { color } from "@mui/system";
+import axios from "axios";
+import ImageGallery from "react-image-gallery";
+import "react-image-gallery/styles/css/image-gallery.css";
+import { useEffect, useState } from "react";
+import axiosInstance from "../../services/APIClient";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -25,7 +30,18 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     padding: 24,
   },
 }));
-
+const AuctionButton = styled("button")({
+  backgroundColor: "#ac46a4",
+  color: "#FFFF",
+  padding: "22px 32px",
+  fontSize: "18px",
+  borderRadius: "4px",
+  border: "none",
+  cursor: "pointer",
+  "&:hover": {
+    backgroundColor: "#958ef8",
+  },
+});
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
@@ -38,50 +54,93 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const slideImages = [
   {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg/400px-2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg",
+    original:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg/400px-2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg",
+    thumbnail:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg/400px-2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg",
+    originalHeight: 400,
   },
   {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/AudiS_five.jpg/400px-AudiS_five.jpg",
+    original:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/AudiS_five.jpg/400px-AudiS_five.jpg",
+    thumbnail:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/AudiS_five.jpg/400px-AudiS_five.jpg",
+    originalHeight: 400,
   },
   {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/2013_Mercedes-Benz_SL_550_vf.jpg/400px-2013_Mercedes-Benz_SL_550_vf.jpg",
+    original:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/2013_Mercedes-Benz_SL_550_vf.jpg/400px-2013_Mercedes-Benz_SL_550_vf.jpg",
+    thumbnail:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/2013_Mercedes-Benz_SL_550_vf.jpg/400px-2013_Mercedes-Benz_SL_550_vf.jpg",
+    originalHeight: 400,
   },
   {
-    url: "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
+    original:
+      "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
+    thumbnail:
+      "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
+    originalHeight: 400,
   },
   {
-    url: "https://images.unsplash.com/photo-1547038577-da80abbc4f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=755&q=80",
+    original:
+      "https://images.unsplash.com/photo-1547038577-da80abbc4f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=755&q=80",
+    thumbnail:
+      "https://images.unsplash.com/photo-1547038577-da80abbc4f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=755&q=80",
+    originalHeight: 400,
   },
-
   {
-    url: "https://images.unsplash.com/photo-1542228262-3d663b306a53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80",
+    original:
+      "https://images.unsplash.com/photo-1542228262-3d663b306a53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80",
+    thumbnail:
+      "https://images.unsplash.com/photo-1542228262-3d663b306a53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80",
+    originalHeight: 400,
   },
 ];
 
+interface Image {
+  original: string;
+  thumbnail: string;
+  originalHeight: number;
+}
 const InformationMyCar = () => {
   const { id } = useParams();
   const { data } = useSelectedCar(id!);
-  const damage = "Front-end damage,nd damage,Front-end damage";
-  const damageList = damage.split(",");
+  const [images, setImages] = useState<Image[]>([]);
+
+  useEffect(() => {
+    if (data?.images) {
+      const updatedImages = data.images.map((image: string) => {
+        return { original: image, thumbnail: image, originalHeight: 400 };
+      });
+      setImages(updatedImages);
+    }
+  }, [data]);
+
+  let damageList = [""];
+  if (data?.damage) {
+    damageList = data?.damage.split(",");
+  } else {
+    damageList = [];
+  }
+  const handleCarAction = async () => {
+    axiosInstance.post("/request_auction", {
+      car_id: id,
+    });
+  };
   return (
     <>
       <Grid container spacing={5}>
         <Grid item xs={12} lg={6}>
-          <Slide>
-            {slideImages.map((slideImage, index) => (
-              <div key={index}>
-                <Box
-                  style={{
-                    backgroundSize: "cover",
-                    height: "400px",
-                    backgroundImage: `url(${slideImage.url})`,
-                  }}
-                ></Box>
-              </div>
-            ))}
-          </Slide>
+          <ImageGallery items={images} slideInterval={3000} showIndex={true} />
         </Grid>
         <Grid container item xs={12} lg={6} spacing={1}>
+          <Grid item xs={12} lg={12}>
+            <Box sx={{ display: "flex", justifyContent: "right" }}>
+              <AuctionButton onClick={handleCarAction}>
+                add your car to auction
+              </AuctionButton>
+            </Box>
+          </Grid>
           <Grid item xs={12} lg={6}>
             <TableContainer component={Paper}>
               <Table sx={{ minWidth: 90 }} aria-label="customized table">
@@ -209,25 +268,28 @@ const InformationMyCar = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <TableContainer style={{ marginTop: "10px" }} component={Paper}>
-              <Table sx={{ minWidth: 90 }} aria-label="customized table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell align="right">damage</StyledTableCell>
-                    <StyledTableCell></StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {damageList.map((damage) => (
-                    <StyledTableRow>
-                      <StyledTableCell align="center" scope="row">
-                        {damage}
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            {data?.damage ? (
+              <TableContainer style={{ marginTop: "10px" }} component={Paper}>
+                <Table sx={{ minWidth: 90 }} aria-label="customized table">
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableCell align="center">damage</StyledTableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {damageList?.map((damage) => (
+                      <StyledTableRow>
+                        <StyledTableCell align="center" scope="row">
+                          {damage}
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : (
+              <></>
+            )}
           </Grid>
         </Grid>
       </Grid>

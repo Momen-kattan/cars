@@ -30,13 +30,19 @@ const MainSection = ({ setValues, values }: Props) => {
     // if (values.technical_condition.find((t) => t["state"])) {
     // }
     setter?.(
-      (values: { technical_condition: { id: number; state: string }[] }) => ({
-        ...values,
-        technical_condition: [
-          ...values.technical_condition,
-          { id: id, state: value },
-        ],
-      })
+      (values: {
+        technical_condition: { main_section_id: number; status: string }[];
+      }) => {
+        return {
+          ...values,
+          technical_condition: [
+            ...values.technical_condition.filter(
+              (option) => option.main_section_id !== id
+            ),
+            { main_section_id: id, status: value },
+          ],
+        };
+      }
     );
   };
   return (
@@ -63,7 +69,7 @@ const MainSection = ({ setValues, values }: Props) => {
           >
             <FormControlLabel
               required
-              value="VG"
+              value="Y"
               control={
                 <Radio
                   sx={{
@@ -78,7 +84,7 @@ const MainSection = ({ setValues, values }: Props) => {
             />
             <FormControlLabel
               required
-              value="G"
+              value="x"
               control={
                 <Radio
                   sx={{
@@ -108,7 +114,7 @@ const MainSection = ({ setValues, values }: Props) => {
             />
             <FormControlLabel
               required
-              value="B"
+              value="N"
               control={
                 <Radio
                   sx={{

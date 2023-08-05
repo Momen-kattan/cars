@@ -15,25 +15,27 @@ const DamageList = ({
 }: Props) => {
   const handelAddDamageString = (event: any, setter?: Function) => {
     const value = event.target.value;
+
     SetDamageState(damageState + value[0]);
     setter?.((values: { damage: string }) => ({
       ...values,
-      damage: value[0],
+      damageList: value,
     }));
   };
   const damages = [
-    "Front-end damage ,",
-    "Rear-end damage ,",
-    "Side-impact damage ,",
-    "Fender-bender damage ,",
-    "Door damage ,",
-    "Bumper damage ,",
-    "Hail damage ,",
-    "Scratches and dents ,",
+    "Front-end damage ",
+    "Rear-end damage ",
+    "Side-impact damage ",
+    "Fender-bender damage ",
+    "Door damage ",
+    "Bumper damage ",
+    "Hail damage ",
+    "Scratches and dents ",
     "Broken windows",
     "Structural damage",
     "sunken car",
   ];
+
   return (
     <FormControl>
       <InputLabel id="damage-label" sx={{ fontSize: 20 }}>
@@ -47,7 +49,6 @@ const DamageList = ({
         value={value}
         onChange={(e) => handelAddDamageString(e, SetValue)}
         label="Select damages"
-        renderValue={(selected) => selected.join(", ")}
         disabled={clean_title === "false" ? false : true}
       >
         {damages.map((d) => (

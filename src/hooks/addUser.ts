@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import axiosInstance from '../services/APIClient';
 export interface User{
   first_name: string,
   last_name:string,
@@ -11,6 +12,6 @@ export interface User{
 }
 
 const addUser=()=>{
-  useMutation({mutationFn:(user:User)=>axios.post("https://abdelwahapbak2.pythonanywhere.com/create_client",user).then(res=>res.data)})
+  useMutation({mutationFn:(user:User)=>axiosInstance.post( "/create_client",user).then(res=> { return res.data})})
 }
 export default addUser

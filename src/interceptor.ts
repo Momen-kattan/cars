@@ -1,4 +1,5 @@
 import axios from "axios";
+import axiosInstance from "./services/APIClient";
 export  interface TokenResponse {
     access: string;
   }
@@ -7,7 +8,8 @@ export  interface TokenResponse {
   const setAuthToken = (token: string | null) => {
     if (token) {
       // Apply the token to every request header
-      axios.defaults.headers.common["Authorization"] = `motors&more ${token}`;
+      axiosInstance.defaults.headers.common["Authorization"] = `motors&more ${token}`;
+      
     } else {
       // Remove the token from the headers
       delete axios.defaults.headers.common["Authorization"];

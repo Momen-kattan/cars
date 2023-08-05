@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import APIClient from '../services/APIClient';
 import axios from 'axios';
+import axiosInstance from '../services/APIClient';
 export interface  Car   {
   id:number
     mileage: string,
@@ -15,12 +16,15 @@ export interface  Car   {
         price: number,
         location: string,
         car_model: string,
+        damage:string,
+        status:string,
+        main_section:[],
         images: string[]
   }
 const useCar= () =>{
 const apiClient=async ()=> {
- const result= await axios.get<Car[]> ( 
- "https://abdelwahapbak2.pythonanywhere.com/car/"
+ const result= await axiosInstance.get<Car[]> ( 
+  "/car/"
 )
 return result.data
 }

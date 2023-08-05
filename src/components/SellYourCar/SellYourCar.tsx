@@ -1,6 +1,6 @@
-import { Box, Button, FormControl } from "@mui/material";
+import { Box, Button, FormControl, Stack } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
@@ -22,6 +22,10 @@ import ManufacturingYear from "./components/ManufacturingYear";
 import Province from "./components/Province";
 import UploadFileButton from "./components/UploadFileButton";
 import UploadImage from "./components/UploadImage";
+import useProfile from "../../hooks/useAuth";
+import { useNavigate } from "react-router";
+import { checkoutSchema } from "./utils/checkoutSchema";
+import axiosInstance from "../../services/APIClient";
 
 const initialValues = {
   mileage: "",
@@ -54,33 +58,27 @@ const SellYourCar = () => {
   const [provineceData, setProvineceData] = useState<any>([]);
   const [carModelData, setCarModelData] = useState<any>([]);
   const [numFilesSelected, setNumFilesSelected] = useState<number>(0);
+  const { data: profile } = useProfile();
+  const navigate = useNavigate();
+  const client = useQueryClient();
 
   const onSubmit = async (values: any) => {
-    await axios
-      .post(
-        "https://abdelwahapbak2.pythonanywhere.com/upload_images",
-        values.file,
-
-        {
-          headers: { "Content-type": "multipart/form-data" },
-        }
-      )
-      .then((v) => {
-        console.log("vvv ", v);
-        axios.post("https://abdelwahapbak2.pythonanywhere.com/car/", values);
+    await axiosInstance.post("/car/", values).then((res) => {
+      const imageParameter = { file: values.file, car_id: res.data.id };
+      axiosInstance.post("/upload_images", imageParameter, {
+        headers: { "Content-type": "multipart/form-data" },
       });
+    });
   };
   useEffect(() => {
     const token = localStorage.getItem("token");
     setAuthToken(token);
   }, []);
 
-  const { mutate } = useMutation(onSubmit);
-
   return (
     <Box m="20px ">
       <Formik
-        onSubmit={mutate}
+        onSubmit={onSubmit}
         initialValues={initialValues}
         // validationSchema={checkoutSchema}
       >
@@ -92,6 +90,7 @@ const SellYourCar = () => {
           handleChange,
           handleSubmit,
           setValues,
+          resetForm,
         }) => {
           console.log(values);
           return (
@@ -128,7 +127,7 @@ const SellYourCar = () => {
                 />
 
                 <TextField
-                  label="Notes and Special specifications your car:"
+                  label="Notes and Special specifications about your car:"
                   required
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -181,19 +180,40 @@ const SellYourCar = () => {
                 <MainSection values={values} setValues={setValues} />
               </Box>
               <Box display="flex" justifyContent="end" mt="20px">
-                <Button
-                  type="submit"
-                  color="secondary"
-                  onClick={() => {
-                    setValues({
-                      ...values,
-                      damage: damageState,
-                    });
-                  }}
-                  variant="contained"
-                >
-                  submit your car information
-                </Button>
+                <Stack direction="row" spacing={3}>
+                  {profile?.user_kind === "Company" ? (
+                    <Button
+                      type="submit"
+                      color="secondary"
+                      onClick={() => {
+                        setValues({
+                          ...values,
+                          damage: damageState,
+                        });
+                        window.location.reload();
+                      }}
+                      variant="contained"
+                    >
+                      save and add another car
+                    </Button>
+                  ) : (
+                    <></>
+                  )}
+
+                  <Button
+                    type="submit"
+                    color="secondary"
+                    onClick={() => {
+                      setValues({
+                        ...values,
+                        damage: damageState,
+                      });
+                    }}
+                    variant="contained"
+                  >
+                    submit your car information
+                  </Button>
+                </Stack>
               </Box>
             </form>
           );

@@ -4,12 +4,7 @@ import Footer from "./components/Footer/Footer.Home";
 import ApiIcon from "@mui/icons-material/Api";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
-import SliderBar from "./components/SliderBar";
-import NavBar from "./components/NavBar";
 import SearchPart from "./components/NavBar/SearchPart";
-import myLogo from "./Logo.png";
-import axios from "axios";
-import { Sidebar } from "react-pro-sidebar";
 
 export const AppComponent = () => {
   const navigate = useNavigate();

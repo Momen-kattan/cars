@@ -28,7 +28,7 @@ export default function NavBar() {
   const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
-  console.log("data", data);
+
   return (
     <Box
       sx={{

@@ -2,11 +2,13 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
+import { useNavigate } from "react-router";
 
 export default function HeroSection() {
+  const navigate = useNavigate();
+
   return (
     <Box
       sx={{
@@ -41,7 +43,14 @@ export default function HeroSection() {
         >
           <Button variant="contained">Join an auction</Button>
           <Button variant="outlined">later action</Button>
-          <Button variant="outlined">calender action</Button>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              navigate("/Calendar");
+            }}
+          >
+            calender action
+          </Button>
         </Stack>
       </Container>
     </Box>

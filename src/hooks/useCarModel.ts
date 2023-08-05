@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import APIClient from '../services/APIClient';
 import axios from 'axios';
+import axiosInstance from '../services/APIClient';
 type  car_model =  {
     id: number;
     name: string;
@@ -8,8 +9,8 @@ type  car_model =  {
   }[] 
 const useCarModel= (id:number) =>{
 const apiClient=async ()=> {
- const result= await axios.get<car_model> ( 
- "https://abdelwahapbak2.pythonanywhere.com/car_model/"+id
+ const result= await axiosInstance.get<car_model> ( 
+  "/car_model/"+id
 )
 console.log(result.data)
 return result.data

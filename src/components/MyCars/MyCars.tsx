@@ -1,33 +1,21 @@
-import { Box, Grid, Paper, Stack, Typography, styled } from "@mui/material";
-import React from "react";
+import {
+  Box,
+  CircularProgress,
+  Dialog,
+  Grid,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { Slide } from "react-slideshow-image";
 import "react-slideshow-image/dist/styles.css";
-import { ViewCarousel } from "@mui/icons-material";
 import { Link } from "react-router-dom";
-import useCar, { Car } from "../../hooks/useMyCar";
-import imageNotFound from "./../../images/notFound2.png";
-import { width } from "@mui/system";
-const slideImages = [
-  {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg/400px-2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg",
-  },
-  {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/AudiS_five.jpg/400px-AudiS_five.jpg",
-  },
-  {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/2013_Mercedes-Benz_SL_550_vf.jpg/400px-2013_Mercedes-Benz_SL_550_vf.jpg",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1547038577-da80abbc4f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=755&q=80",
-  },
-
-  {
-    url: "https://images.unsplash.com/photo-1542228262-3d663b306a53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80",
-  },
-];
+import useCar from "../../hooks/useMyCar";
+import imageNotFound from "./../../../dist/assets/notFound2-540c3920.png";
+import ClearIcon from "@mui/icons-material/Clear";
+import React from "react";
+import PopUP from "./PopUP";
+import { Loader } from "../Loader";
 interface MyCarS {
   id: number;
   car_models: string;
@@ -36,7 +24,14 @@ interface MyCarS {
 }
 
 const Card = ({ car_models, price, images, id }: MyCarS) => {
-  console.log("sssssssssssssssssssss");
+  const [open, setOpen] = React.useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
     <Box
       sx={{
@@ -51,12 +46,11 @@ const Card = ({ car_models, price, images, id }: MyCarS) => {
         transition: "all 1s ease-out",
       }}
     >
-      {!images ? (
+      {images.length === 0 ? (
         <div>
           <Box
             style={{
               backgroundSize: "cover",
-
               height: "200px",
               backgroundImage: `url(${imageNotFound})`,
             }}
@@ -77,7 +71,12 @@ const Card = ({ car_models, price, images, id }: MyCarS) => {
           ))}
         </Slide>
       )}
-
+      <IconButton style={{ position: "absolute", top: 0, right: 0 }}>
+        <ClearIcon onClick={handleClickOpen} />
+        <Dialog open={open} onClose={handleClose}>
+          <PopUP setOpen={handleClose} car_id={id} />
+        </Dialog>
+      </IconButton>
       <Link
         to={"/InformationMyCar/" + id}
         style={{ textDecoration: "none", color: "black" }}
@@ -91,13 +90,11 @@ const Card = ({ car_models, price, images, id }: MyCarS) => {
   );
 };
 const MyCars = () => {
-  const { data, error } = useCar();
-  // if (error) {
-  //   return <p>error in data</p>;
-  // }
+  const { data, error, isFetching, isLoading } = useCar();
   const handle = (data: {}) => {
     console.log(data);
   };
+  if (isLoading) return <Loader />;
   return (
     <Box sx={{ flexGrow: 1, mx: 5 }}>
       <Grid container spacing={5} columns={{ xs: 4, sm: 8, md: 12 }}>

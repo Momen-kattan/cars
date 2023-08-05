@@ -2,6 +2,7 @@ import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import React from "react";
 import useCountry from "../../../hooks/useCountry";
 import axios from "axios";
+import axiosInstance from "../../../services/APIClient";
 
 interface Props {
   SetProvinece: (e: any) => void;
@@ -13,9 +14,7 @@ const Country = ({ SetProvinece }: Props) => {
     isLoading: loadCountry,
   } = useCountry();
   const handleSelect = async (event: any) => {
-    let provinece = await axios.get(
-      `https://abdelwahapbak2.pythonanywhere.com/province/${event.target.value}`
-    );
+    let provinece = await axiosInstance.get(`/province/${event.target.value}`);
     SetProvinece(provinece.data);
   };
   return (

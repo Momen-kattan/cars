@@ -3,11 +3,11 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
-import { Facebook, Instagram, Twitter } from "@mui/icons-material";
+import { Facebook, Instagram, Twitter, YouTube } from "@mui/icons-material";
 import { Box } from "@mui/material";
 import { keyframes } from "@emotion/react";
 
-const footerBgColor = "#242424";
+const footerBgColor = "#202124";
 const footerTextColor = "#F5F5F5";
 const footerLinkColor = "#F7C331";
 
@@ -37,7 +37,7 @@ const pulse = keyframes`
   }
 `;
 
-export default function Footer(): JSX.Element {
+export default function Footer() {
   return (
     <Box
       component="footer"
@@ -64,8 +64,8 @@ export default function Footer(): JSX.Element {
               variant="body2"
               sx={{ animation: `${pulse} 1s ease-in-out infinite` }}
             >
-              (Motors And More) your best way to find your car in the best time
-              and best coast
+              Motors And More is the perfect place to find your dream car at the
+              best price and quality.
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4} sx={{ textAlign: "center" }}>
@@ -76,6 +76,7 @@ export default function Footer(): JSX.Element {
             >
               Contact Us
             </Typography>
+            <Typography variant="body1"></Typography>
             <Typography variant="body2">
               123 Main Street, Anytown, USA
             </Typography>
@@ -89,7 +90,7 @@ export default function Footer(): JSX.Element {
                   "&:hover": { textDecoration: "underline" },
                 }}
               >
-                info@example.com
+                MotorsAndMore@gmail.com
               </Link>
             </Typography>
             <Typography variant="body2">
@@ -105,6 +106,20 @@ export default function Footer(): JSX.Element {
                 +963 234 567 8901
               </Link>
             </Typography>
+            <Typography variant="body2">
+              Fax:{" "}
+              <Link
+                href="fax:123-456-7890"
+                color={footerLinkColor}
+                sx={{
+                  textDecoration: "none",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
+                123-456-7890
+              </Link>
+            </Typography>
+            <Box sx={{ mt: 2 }}></Box>
           </Grid>
           <Grid item xs={12} sm={4} sx={{ textAlign: "center" }}>
             <Typography
@@ -133,20 +148,22 @@ export default function Footer(): JSX.Element {
               <Link href="https://www.twitter.com/" color={footerLinkColor}>
                 <Twitter sx={{ fontSize: "3rem" }} />
               </Link>
+              <Link href="https://www.youtube.com/" color={footerLinkColor}>
+                <YouTube sx={{ fontSize: "3rem" }} />
+              </Link>
+            </Box>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2">
+                Follow us on our social media profiles for updates and
+                promotions.
+              </Typography>
             </Box>
           </Grid>
         </Grid>
-        <Box mt={5} sx={{ display: "flex", justifyContent: "center" }}>
-          <Typography
-            variant="body2"
-            align="center"
-            sx={{ color: footerLinkColor }}
-          >
-            {"Designed and built by "}
-            <Link color={footerLinkColor} href="https://your-website.com/">
-              Your Website
-            </Link>{" "}
-            {new Date().getFullYear()}
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="body2" align="center">
+            &copy; {new Date().getFullYear()} Motors And More. All rights
+            reserved.
           </Typography>
         </Box>
       </Container>
