@@ -193,7 +193,12 @@ const InformationMyCar = () => {
                       {data?.location}
                     </StyledTableCell>
                   </StyledTableRow>
-
+                  <StyledTableRow>
+                    <StyledTableCell scope="row">status</StyledTableCell>
+                    <StyledTableCell align="right">
+                      {data?.status}
+                    </StyledTableCell>
+                  </StyledTableRow>
                   <StyledTableRow>
                     <StyledTableCell scope="row">car_models</StyledTableCell>
                     <StyledTableCell align="right">
