@@ -41,6 +41,11 @@ export default function Regist() {
       console.log("hi", values);
       await axiosInstance.post("/create_client", values);
     },
+    onSuccess: () => {
+      console.log("haha");
+
+      navigate("/");
+    },
   });
   if (errorcountry) throw errorcountry;
 
@@ -120,12 +125,7 @@ export default function Regist() {
                 {(error as { message: string }).message as string}{" "}
               </Alert>
             )}
-            <Box
-              component="form"
-              noValidate
-              onSubmit={handleSubmit}
-              sx={{ mt: 3, maxWidth: "md" }}
-            >
+            <Box component="form" noValidate sx={{ mt: 3, maxWidth: "md" }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField
@@ -293,11 +293,9 @@ export default function Regist() {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
                 disabled={!isEmpty(errors)}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   handleSubmit(values);
-                  if (!(error as { message: string }).message) {
-                    navigate("/");
-                  }
                 }}
               >
                 Sign Up
