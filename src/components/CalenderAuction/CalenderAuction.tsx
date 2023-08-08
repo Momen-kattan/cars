@@ -29,7 +29,6 @@ const CalenderAuction = () => {
       );
     }
   }, [data?.length]);
-  console.log(data);
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between">

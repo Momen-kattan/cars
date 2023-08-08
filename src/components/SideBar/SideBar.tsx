@@ -101,17 +101,6 @@ export default function MiniDrawer() {
   const [auctionId, setAuctionID] = useState("");
   const [CanJoin, setCanJoin] = useState(false);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (count > 0) {
-        setCount(count - 1);
-      } else {
-        setCount(5);
-      }
-    }, 1000);
-
-    return () => {};
-  }, [count]);
   const [state, setState] = React.useState<State>({
     opensnak: false,
     vertical: "top",
@@ -133,14 +122,13 @@ export default function MiniDrawer() {
   const handleDrawerOpen = () => {
     setOpen(true);
   };
-
+  function onConnect() {
+    setIsConnected(true);
+  }
   const handleDrawerClose = () => {
     setOpen(false);
   };
   useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
-    }
     socket.on("connect", onConnect);
     socket.on("has_live_auction", (data) => {
       console.log(data);

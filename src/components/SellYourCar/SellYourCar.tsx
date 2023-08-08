@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, Stack } from "@mui/material";
+import { Alert, Box, Button, FormControl, Stack } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -61,15 +61,22 @@ const SellYourCar = () => {
   const { data: profile } = useProfile();
   const navigate = useNavigate();
   const client = useQueryClient();
-
-  const onSubmit = async (values: any) => {
-    await axiosInstance.post("/car/", values).then((res) => {
-      const imageParameter = { file: values.file, car_id: res.data.id };
-      axiosInstance.post("/upload_images", imageParameter, {
-        headers: { "Content-type": "multipart/form-data" },
-      });
-    });
-  };
+  const {
+    mutate: handleSubmit,
+    status,
+    error,
+  } = useMutation({
+    mutationFn: async (values: any) => {
+      await axiosInstance
+        .post("/car/", { ...values, damage: (values.damageList as []).join() })
+        .then((res) => {
+          const imageParameter = { file: values.file, car_id: res.data.id };
+          axiosInstance.post("/upload_images", imageParameter, {
+            headers: { "Content-type": "multipart/form-data" },
+          });
+        });
+    },
+  });
   useEffect(() => {
     const token = localStorage.getItem("token");
     setAuthToken(token);
@@ -78,7 +85,7 @@ const SellYourCar = () => {
   return (
     <Box m="20px ">
       <Formik
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
         initialValues={initialValues}
         // validationSchema={checkoutSchema}
       >
@@ -92,9 +99,15 @@ const SellYourCar = () => {
           setValues,
           resetForm,
         }) => {
-          console.log(values);
+          console.log("valyes", values);
+
           return (
             <form onSubmit={handleSubmit}>
+              {(error as string) && (
+                <Alert severity="error">
+                  {(error as { message: string }).message as string}{" "}
+                </Alert>
+              )}
               <Box
                 display="grid"
                 gap="30px"
@@ -208,6 +221,9 @@ const SellYourCar = () => {
                         ...values,
                         damage: damageState,
                       });
+                      // if (!error) {
+                      //   navigate("/");
+                      // }
                     }}
                     variant="contained"
                   >

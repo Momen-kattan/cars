@@ -10,6 +10,8 @@ import * as React from "react";
 import { Image } from "@mui/icons-material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import FF from "../../sound/clickbidding.mp3";
+import HH from "../../sound/audio_2023-08-07_00-11-03.ogg";
 import {
   Avatar,
   Box,
@@ -66,50 +68,6 @@ interface Image {
   thumbnail: string;
   originalHeight: number;
 }
-const slideImages = [
-  {
-    original:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg/400px-2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg",
-    thumbnail:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg/400px-2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg",
-    originalHeight: 400,
-  },
-  {
-    original:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/AudiS_five.jpg/400px-AudiS_five.jpg",
-    thumbnail:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/AudiS_five.jpg/400px-AudiS_five.jpg",
-    originalHeight: 400,
-  },
-  {
-    original:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/2013_Mercedes-Benz_SL_550_vf.jpg/400px-2013_Mercedes-Benz_SL_550_vf.jpg",
-    thumbnail:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/2013_Mercedes-Benz_SL_550_vf.jpg/400px-2013_Mercedes-Benz_SL_550_vf.jpg",
-    originalHeight: 400,
-  },
-  {
-    original:
-      "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
-    thumbnail:
-      "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
-    originalHeight: 400,
-  },
-  {
-    original:
-      "https://images.unsplash.com/photo-1547038577-da80abbc4f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=755&q=80",
-    thumbnail:
-      "https://images.unsplash.com/photo-1547038577-da80abbc4f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=755&q=80",
-    originalHeight: 400,
-  },
-  {
-    original:
-      "https://images.unsplash.com/photo-1542228262-3d663b306a53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80",
-    thumbnail:
-      "https://images.unsplash.com/photo-1542228262-3d663b306a53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80",
-    originalHeight: 400,
-  },
-];
 function CircularProgressWithLabel(
   props: CircularProgressProps & { value: number; currentPrice: string }
 ) {
@@ -174,15 +132,18 @@ const AuctionLive = () => {
   const [progress, setProgress] = React.useState(1);
   const prices = ["0.5", "1", "2", "5", "7", "10"];
   const [images, setImages] = useState<Image[]>([]);
-  const [audio, state, controls] = useAudio({
-    src: "/cars/src/sound/clickbidding.m4a",
+  const [audio1, state1, controls1] = useAudio({
+    src: FF,
+    autoPlay: false,
+  });
+  const [audio2, state2, controls2] = useAudio({
+    src: HH,
     autoPlay: false,
   });
   const handleSelectChange = (event: any) => {
     setSelectedValue(event.target.value as string);
   };
   const handleBidding = () => {
-    controls.play();
     if (selectedValue === "") {
     } else {
       socket.emit("outbid", {
@@ -199,6 +160,7 @@ const AuctionLive = () => {
     setOwner(data.owner_car_id);
     setAuctionId(data.auction_id);
     setCurrentPrice(data.price);
+    controls2.play();
     cars?.map((car) => {
       if (car.car_info.id < data.car_bids_on_it) {
       } else if (car.car_info.id === data.car_bids_on_it) {
@@ -212,7 +174,6 @@ const AuctionLive = () => {
         }
       } else {
         const listCar = cars.filter((c) => c.car_info.id > data.car_bids_on_it);
-        console.log(listCar);
         setListNextCar(listCar);
       }
     });
@@ -227,8 +188,8 @@ const AuctionLive = () => {
       processAuction(data);
     });
     socket.on("bidding", (data) => {
-      controls.play();
-      console.log(data);
+      controls2.pause();
+      controls1.play();
     });
     return () => {};
   }, [cars, listNextCar]);
@@ -377,7 +338,8 @@ const AuctionLive = () => {
                   </Select>
                 </FormControl>
               </Box>
-              {audio}
+              {audio2}
+              {audio1}
             </Grid>
             <Grid item xs={12} lg={6}>
               <List

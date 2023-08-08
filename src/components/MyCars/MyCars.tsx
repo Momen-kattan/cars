@@ -16,6 +16,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import React from "react";
 import PopUP from "./PopUP";
 import { Loader } from "../Loader";
+import { isArray } from "lodash";
 interface MyCarS {
   id: number;
   car_models: string;
@@ -58,7 +59,7 @@ const Card = ({ car_models, price, images, id }: MyCarS) => {
         </div>
       ) : (
         <Slide>
-          {images.map((slideImage) => (
+          {images?.map((slideImage) => (
             <div>
               <Box
                 style={{
@@ -91,23 +92,24 @@ const Card = ({ car_models, price, images, id }: MyCarS) => {
 };
 const MyCars = () => {
   const { data, error, isFetching, isLoading } = useCar();
-  const handle = (data: {}) => {
-    console.log(data);
-  };
+  console.log("data", data);
+
+  const handle = (data: {}) => {};
   if (isLoading) return <Loader />;
   return (
     <Box sx={{ flexGrow: 1, mx: 5 }}>
       <Grid container spacing={5} columns={{ xs: 4, sm: 8, md: 12 }}>
-        {data?.map((car) => (
-          <Grid item xs={3} onClick={() => handle(car)}>
-            <Card
-              id={car.id}
-              car_models={car.car_model}
-              images={car.images}
-              price={car.price}
-            />
-          </Grid>
-        ))}
+        {isArray(data) &&
+          data?.map((car) => (
+            <Grid item xs={3} onClick={() => handle(car)}>
+              <Card
+                id={car.id}
+                car_models={car.car_model}
+                images={car.images}
+                price={car.price}
+              />
+            </Grid>
+          ))}
       </Grid>
     </Box>
   );

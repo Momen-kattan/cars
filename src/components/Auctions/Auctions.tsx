@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   CircularProgress,
@@ -17,7 +18,7 @@ import { Loader } from "../Loader";
 import useCarAuction from "../../hooks/useCarAuction";
 import axiosInstance from "../../services/APIClient";
 import { autoBatchEnhancer } from "@reduxjs/toolkit";
-
+import { useMutation } from "@tanstack/react-query";
 interface MyCarS {
   id: number;
   car_models: string;
@@ -82,42 +83,58 @@ const Card = ({ car_models, price, images, id }: MyCarS) => {
 const Auctions = () => {
   const { id } = useParams();
   const { data: auction, isLoading } = useCarAuction(id!);
-  const handlejoinAuction = async () => {
-    axiosInstance.post("/request_join_auction", {
-      auction_id: id,
-    });
-  };
+  const {
+    mutate: handleSubmit,
+    status,
+    error,
+  } = useMutation({
+    mutationFn: async (values: any) => {
+      await axiosInstance.post("/request_join_auction", {
+        auction_id: id,
+      });
+    },
+  });
+  // const handlejoinAuction = async () => {
+  //   axiosInstance.post("/request_join_auction", {
+  //     auction_id: id,
+  //   });
+  // };
 
-  const handle = (data: {}) => {
-    console.log(data);
-  };
+  const handle = (data: {}) => {};
   if (isLoading) return <Loader />;
   return (
     <Box>
       {auction &&
       auction.length > 0 &&
       auction[0].auction_status === "later auction" ? (
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{
-            mt: 2,
-            px: 3,
-            py: 2,
-            borderRadius: 5,
-            boxShadow: 3,
-            backgroundColor: "#242424",
-            color: "white",
-            margin: "2.5rem",
-            justifyContent: "flex-start",
-            "&:hover": {
-              backgroundColor: "#bb8900",
-            },
-          }}
-          onClick={handlejoinAuction}
-        >
-          Join Auction
-        </Button>
+        <>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{
+              mt: 2,
+              px: 3,
+              py: 2,
+              borderRadius: 5,
+              boxShadow: 3,
+              backgroundColor: "#242424",
+              color: "white",
+              margin: "2.5rem",
+              justifyContent: "flex-start",
+              "&:hover": {
+                backgroundColor: "#bb8900",
+              },
+            }}
+            onClick={handleSubmit}
+          >
+            Join Auction
+          </Button>
+          {(error as string) && (
+            <Alert severity="error">
+              {(error as { message: string }).message as string}{" "}
+            </Alert>
+          )}
+        </>
       ) : (
         <></>
       )}

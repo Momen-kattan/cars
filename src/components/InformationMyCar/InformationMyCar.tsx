@@ -7,7 +7,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Box, Grid, Typography } from "@mui/material";
+import { Alert, Box, Grid, Typography } from "@mui/material";
 import { Slide } from "react-slideshow-image";
 import useSelectedCar from "../../hooks/useSelectedCar";
 import { useParams } from "react-router-dom";
@@ -19,6 +19,7 @@ import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../services/APIClient";
+import { useMutation } from "@tanstack/react-query";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -52,51 +53,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const slideImages = [
-  {
-    original:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg/400px-2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg",
-    thumbnail:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg/400px-2010_Hyundai_Genesis_Coupe_3_--_08-28-2009.jpg",
-    originalHeight: 400,
-  },
-  {
-    original:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/AudiS_five.jpg/400px-AudiS_five.jpg",
-    thumbnail:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/AudiS_five.jpg/400px-AudiS_five.jpg",
-    originalHeight: 400,
-  },
-  {
-    original:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/2013_Mercedes-Benz_SL_550_vf.jpg/400px-2013_Mercedes-Benz_SL_550_vf.jpg",
-    thumbnail:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/2013_Mercedes-Benz_SL_550_vf.jpg/400px-2013_Mercedes-Benz_SL_550_vf.jpg",
-    originalHeight: 400,
-  },
-  {
-    original:
-      "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
-    thumbnail:
-      "https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80",
-    originalHeight: 400,
-  },
-  {
-    original:
-      "https://images.unsplash.com/photo-1547038577-da80abbc4f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=755&q=80",
-    thumbnail:
-      "https://images.unsplash.com/photo-1547038577-da80abbc4f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=755&q=80",
-    originalHeight: 400,
-  },
-  {
-    original:
-      "https://images.unsplash.com/photo-1542228262-3d663b306a53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80",
-    thumbnail:
-      "https://images.unsplash.com/photo-1542228262-3d663b306a53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=871&q=80",
-    originalHeight: 400,
-  },
-];
-
 interface Image {
   original: string;
   thumbnail: string;
@@ -106,7 +62,18 @@ const InformationMyCar = () => {
   const { id } = useParams();
   const { data } = useSelectedCar(id!);
   const [images, setImages] = useState<Image[]>([]);
-
+  console.log("data123", data);
+  const {
+    mutate: handleSubmit,
+    status,
+    error,
+  } = useMutation({
+    mutationFn: async (values: any) => {
+      await axiosInstance.post("/request_auction", {
+        car_id: id,
+      });
+    },
+  });
   useEffect(() => {
     if (data?.images) {
       const updatedImages = data.images.map((image: string) => {
@@ -115,18 +82,13 @@ const InformationMyCar = () => {
       setImages(updatedImages);
     }
   }, [data]);
-
   let damageList = [""];
   if (data?.damage) {
     damageList = data?.damage.split(",");
   } else {
     damageList = [];
   }
-  const handleCarAction = async () => {
-    axiosInstance.post("/request_auction", {
-      car_id: id,
-    });
-  };
+
   return (
     <>
       <Grid container spacing={5}>
@@ -136,10 +98,15 @@ const InformationMyCar = () => {
         <Grid container item xs={12} lg={6} spacing={1}>
           <Grid item xs={12} lg={12}>
             <Box sx={{ display: "flex", justifyContent: "right" }}>
-              <AuctionButton onClick={handleCarAction}>
+              <AuctionButton onClick={handleSubmit}>
                 add your car to auction
               </AuctionButton>
             </Box>
+            {(error as string) && (
+              <Alert severity="error">
+                {(error as { message: string }).message as string}{" "}
+              </Alert>
+            )}
           </Grid>
           <Grid item xs={12} lg={6}>
             <TableContainer component={Paper}>
@@ -238,36 +205,6 @@ const InformationMyCar = () => {
             </TableContainer>
           </Grid>
           <Grid item xs={12} lg={6}>
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 90 }} aria-label="customized table">
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell align="right">
-                      Bid Information
-                    </StyledTableCell>
-                    <StyledTableCell></StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <StyledTableRow>
-                    <StyledTableCell scope="row">model</StyledTableCell>
-                    <StyledTableCell align="right">535</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell scope="row">model</StyledTableCell>
-                    <StyledTableCell align="right">535</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell scope="row">model</StyledTableCell>
-                    <StyledTableCell align="right">535</StyledTableCell>
-                  </StyledTableRow>
-                  <StyledTableRow>
-                    <StyledTableCell scope="row">model</StyledTableCell>
-                    <StyledTableCell align="right">535</StyledTableCell>
-                  </StyledTableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
             {data?.damage ? (
               <TableContainer style={{ marginTop: "10px" }} component={Paper}>
                 <Table sx={{ minWidth: 90 }} aria-label="customized table">

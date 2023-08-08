@@ -12,7 +12,7 @@ export  interface  UserProfile   {
 const useProfile= () =>{
 const apiClient=async ()=> {
  const result= await axiosInstance.get<UserProfile>( 
-  "/auth/users/me/"
+  "/auth/users/me/",
 )
 
 

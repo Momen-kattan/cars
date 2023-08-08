@@ -16,12 +16,10 @@ import { Props } from "./types";
 import { br } from "@fullcalendar/core/internal-common";
 const Login = ({ setOpen }: Props): JSX.Element => {
   const { refetch } = useProfile();
-
   const navigate = useNavigate();
   if (localStorage.getItem("token")) {
     setAuthToken(localStorage.getItem("token"));
   }
-
   const onSuccess = () => {
     refetch();
     navigate("/");

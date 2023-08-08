@@ -12,7 +12,6 @@ const apiClient=async ()=> {
  const result= await axiosInstance.get<car_model> ( 
   "/car_model/"+id
 )
-console.log(result.data)
 return result.data
 }
 return useQuery({
