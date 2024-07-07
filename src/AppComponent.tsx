@@ -10,7 +10,7 @@ export const AppComponent = () => {
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ display: "100vh", overflow: "hidden", pb: 5 }}>
+    <Box sx={{ display: "100vh", overflow: "hidden", pb: 6 }}>
       <Stack
         sx={{
           py: 1,
